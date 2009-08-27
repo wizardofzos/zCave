@@ -26,24 +26,33 @@ require_once(dirname(__FILE__)."/lib/fpdi/fpdi.php");
 
 class PDF extends FPDF
 {
+//Load data
+function LoadData($file)
+{
+    //* TODO: set this function so it reads from the DB :
+    //*       set this function so it reads XML-streams :
+    //*       
+    //*       read header info too!!!
+    
+    
+    //Read basic CSV file lines
+    $lines=file($file);
+    $data=array();
+    foreach($lines as $line)
+        $data[]=explode(';',chop($line));
+    return $data;
+}
 //Page header
 function Header()
 {
     //Logo
-    $this->Image(dirname(__FILE__).'/images/logo.png',10,8,33);
+    
     //Arial bold 15
     $this->SetFont('Helvetica','B',8);
     //Move to the right
    
-    //Title
-    $theTitle = "Financieel overzicht van " .
-                "dd-mm-eejj" .
-                " tot en met " .
-                "dd-mm-eejj" .
-                ". Dit is pagina " .
-                $this->PageNo() .
-                " van {nb}";
-    $this->Cell(190,10,$theTitle,0,0,'R');
+    //Repeat on every page start
+    $this->Cell(190,10,"Overzicht",0,0,'R');
     $this->Ln(3);
     $this->Cell(190,10,'Periode van: dd-mm-eejj',0,0,'R');
     $this->Ln(3);
@@ -64,17 +73,74 @@ function Footer()
     //Page number
     $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
 }
+
+
+
+
+
+function FancyTable($header,$data)
+{
+    //Colors, line width and bold font
+    $this->SetFillColor(199,112,45);
+    $this->SetTextColor(255);
+    $this->SetDrawColor(200,149,109);
+    $this->SetLineWidth(.3);
+    $this->SetFont('','B');
+    //Header
+    $w=array(62,43,43,43);
+    for($i=0;$i<count($header);$i++)
+        $this->Cell($w[$i],7,$header[$i],1,0,'L',true);
+    $this->Ln();
+    //Color and font restoration
+    $this->SetFillColor(246,214,189);
+    $this->SetTextColor(0);
+    $this->SetFont('');
+    //Data
+    $fill=false;
+    foreach($data as $row)
+    {
+        $this->Cell($w[0],6,$row[0],'LR',0,'L',$fill);
+        $this->Cell($w[1],6,'€ '.money_format('%(#10i',$row[1]),'LR',0,'L',$fill);
+        $this->Cell($w[2],6,'€ '.money_format('%(#10i',$row[2]),'LR',0,'R',$fill);
+        $this->Cell($w[3],6,'€ '.money_format('%(#10i',$row[3]),'LR',0,'R',$fill);
+        $this->Ln();
+        $fill=!$fill;
+    }
+    // Blanc then totals
+    $this->Cell($w[0],6,'','LR',0,'L',$fill);
+    $this->Cell($w[1],6,'','LR',0,'L',$fill);
+    $this->Cell($w[2],6,'','LR',0,'R',$fill);
+    $this->Cell($w[3],6,'','LR',0,'R',$fill);
+    $this->Ln();
+    $this->SetFillColor(201,87,0);
+    $this->SetTextColor(16);
+   
+    $this->Cell($w[0],6,'TOTAAL','LRT',0,'R',$fill);
+    $this->Cell($w[1],6,'€ '.money_format('%(#10i',232323.65),'LRT',0,'L',false);
+    $this->Cell($w[2],6,'€ '.money_format('%(#10i',232323.65),'LRT',0,'R',false);
+    $this->Cell($w[3],6,'€ '.money_format('%(#10i',232323.65),'LRT',0,'R',false);
+    $this->Ln();
+    
+    $this->Cell(array_sum($w),0,'','T');
+}
 }
 
-//Instanciation of inherited class
 $pdf=new PDF();
 $pdf->AliasNbPages();
 $pdf->AddPage();
-$pdf->SetFont('Times','',12);
-for($i=1;$i<=40;$i++)
-    $pdf->Cell(0,10,'Printing line number '.$i,0,1);
+$pdf->SetFont('Courier','',12);
+// 40 lines per page? or less coz landscape
+
+
+$header        = array('Financiele Groep','Netto Bedrag','BTW','Totaal');
+
+$data=$pdf->LoadData('000000001.data');
+
+
+
+$pdf->FancyTable($header,$data);
 $pdf->Output();
-?>
+
 
 
 
