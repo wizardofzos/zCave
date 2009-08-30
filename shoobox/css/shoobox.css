@@ -1,0 +1,94 @@
+#header{
+	text-align: right;
+	padding-richt: 15px;
+	
+}
+
+#boxbar{
+	position: relative;
+	top: -100px;
+}
+
+.box{
+	width: 100px;
+	height: 100px;
+}
+
+#documents{
+	width: 800px;
+	}
+#documents a{
+	
+}
+
+#documents img{
+	padding: 15px;
+	height: 100px;
+	border: 1px;
+	border-style: solid;
+	border-color: #303030;
+}
+
+.suggestionsBox {
+		position: relative;
+		left: 30px; 
+		margin: 10px 0px 0px 0px;
+		width: 200px;
+		background-color: #AFCDE7;
+		-moz-border-radius: 7px;
+		-webkit-border-radius: 7px;
+		border: 2px solid #000;	
+		color: #fff;
+		font-family: Arial Black;
+		font-size: 20px;
+	}
+	
+	.suggestionList {
+		margin: 0px;
+		padding: 0px;
+	}
+	
+	.suggestionList li {
+		
+		margin: 0px 0px 3px 0px;
+		padding: 3px;
+		cursor: pointer;
+	}
+	
+	.suggestionList li:hover {
+		background-color: #303030;
+		
+		
+		
+		.imageLibrary {
+display: inline;
+clear: none;
+}
+.imageLibrary li {
+list-style-type: none;
+margin-left: 10px;
+display: inline;
+clear: none;
+}
+.imageLibrary p {
+position: absolute;
+margin: 0px;
+margin-left: 2px;
+margin-top: 2px;
+z-index:2;
+background-Color: #555555;
+color: #ffffff;
+width: 80px;
+text-align: center;
+padding-top: 5px;
+padding-bottom: 5px;
+opacity:.8;
+display: none;
+clear: none;
+}
+.imageLibrary img {
+z-index:1;
+width: 80px;
+height: 80px;
+border: #888888 groove 2px;
+}
