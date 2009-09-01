@@ -1,0 +1,33 @@
+<?
+class ShooboxItem{
+  
+  public $id;
+  public $box;
+  public $value;
+  public $tax;
+  public $type;
+  public $description;
+  public $documenttype;
+  public $date;
+    
+  function __construct($item){
+    foreach ($item as $name => $value) {
+      $this->$name = $value;
+    }
+  }
+  
+  function store($db){
+    // Stores the item in MySQL through connector $db
+    
+    $sql = "insert into items (id,box,value,tax,type,description,documenttype,date) values($this->id, $this->box, $this->value, $this->tax, '$this->type', '$this->description', '$this->documenttype', '$this->date')";
+    $db->execute($sql);
+  }
+  
+  function update($db){
+    // Updates the current item in MySQL
+    // Valid entries to change are box, value, tax, type, description
+    $sql = "update items set box=$this->box, value=$this->value, tax=$this->tax, type='$this->type', description='$this->description' where id = $this->id";
+    $db->execute($sql);
+  }
+}
+?>

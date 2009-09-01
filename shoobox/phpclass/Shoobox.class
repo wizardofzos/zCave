@@ -1,0 +1,88 @@
+<?
+class Shoobox{
+  
+  public $shoobox;         // path to the managed documents
+  public $thumbdir;        // path to thumbnails
+  public $backupdir;        // path to backuplocation (future expansion)
+  
+  
+  public $db;              // database connector
+  
+  function __construct($sbconfig,$dbconfig){
+   
+    foreach ($sbconfig as $option => $setting){
+      $this->$option = $setting;
+    }
+    
+    $this->db = new hkMySqlConnector($dbconfig);
+  }
+  
+  function getFromNumberBag($somevalue){
+			// Dangerous Function :)
+			// If you GET some value, you will increase it's number by one too \
+
+			$sql = "select number from numberbag where id='$somevalue'";
+			$res = mysql_query($sql,$this->db->connection);
+			$row = mysql_fetch_row($res);
+			
+			$prev = $row[0];
+			$row[0]++;
+			
+			$sql = "update numberbag set number = '$row[0]' where id ='$somevalue'";
+			$res = mysql_query($sql,$this->db->connection);
+			
+			return $prev;
+	}
+    
+  function addUploaded($document){
+    // Add's a document to the shoobox. $document is a full path to document and should be readable
+    
+    //echo "adding $document";
+    //$id = 13;
+    //$box = 1;
+    //$value = 20;
+    //$tax = 6;
+    //$type = "test entry";
+    //$description = "this is a test entry";
+    //$documenttype = "nul";
+    
+  
+    // Determine the internal name (without extension) for the document. for this we will use the numberbag.
+    $newNumber = $this->getFromNumberBag('documenten');
+    
+    // Determine the original (lowercase) extension for the document.
+    $nameparts = pathinfo($document);
+    $filetype  = strtolower($nameparts['extension']);
+    
+    // Determine full internal filename (pad with zeroes filename => 24bytes)
+    $newName   = str_pad($newNumber, 20, "0", STR_PAD_LEFT);
+
+    // Copy the file to the shoobox
+    $copy_command = "cp '$document' $this->shoobox$newName" . "." . $filetype;
+    system($copy_command);
+    
+    // Create thumbnails 
+    if($filetype == 'pdf'){
+      // If it's a PDF we need this stuff for the thumbnail/jpg creation
+      $convert = "convert $this->shoobox$newName.pdf[0] $this->shoobox$newName.jpg";
+      echo $convert;
+      system($convert);
+      // Create the thumbnail
+      $thumbnail = "convert $this->shoobox$newName.jpg -auto-orient -thumbnail 300x300 $this->thumbdir$newName.jpg";
+      system($thumbnail);
+    }
+    else{
+      // It should be a regular image file (jpeg, jpg, bmp, png, tiff, etc)
+      $thumbnail = "convert $this->shoobox$newName.$filetype -auto-orient -thumbnail 300x300 $this->thumbdir$newName.jpg";
+      system($thumbnail);
+    }
+    
+    // Insert into database
+    $date = date ("Y-m-d H:i:s");
+    $item = new ShooboxItem(array("id" => $newNumber, "box" => 0, "value" => 0, "tax" => 0, "type" => '', "description" => '', "documenttype" => $filetype, "date" => $date));  
+    $item->store($this->db);
+    
+  }
+  
+}
+?>

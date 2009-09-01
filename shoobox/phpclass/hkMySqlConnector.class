@@ -1,0 +1,30 @@
+<?
+
+class hkMySqlConnector{
+    public $host    = "Initial Host";
+    public $user;
+    public $pass;
+    public $database;
+		
+		public $connection;
+    
+	
+    function __construct($config){
+      foreach ($config as $option => $setting){
+        $this->$option = $setting;
+       }
+			 
+			 $this->connection = mysql_connect($this->host,
+							 										       $this->user,
+																	       $this->pass) 
+						  or die("hkMySqlConnector : Could not open MySql connection, this is generally bad");
+			 
+			 mysql_select_db($this->database,$this->connection);														 
+    }
+    
+    function execute($sql){
+			return mysql_query($sql,$this->connection) or die("hkMySqlConnector : Cannot execute query $sql");
+		}
+    
+}
+?>
