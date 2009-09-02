@@ -4,7 +4,7 @@
   $config1 = array(
                          "host" => "localhost",
                          "user" => "root",
-                         "pass" => "blaat123",
+                         "pass" => "",
                          "database" => "shoobox"
   );
     
